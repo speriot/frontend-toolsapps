@@ -1,103 +1,78 @@
 #!/bin/bash
-# Script de diagnostic 404 - Vérifier pods et service
 
-echo "🔍 DIAGNOSTIC 404 - Application"
-echo "================================"
+echo "🔍 DIAGNOSTIC 404 - ANALYSE RAPIDE"
+echo "==================================="
+
+NAMESPACE="production"
+APP_NAME="frontend-toolsapps"
+
 echo ""
+echo "📦 1. Vérification des Pods..."
+kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=frontend-toolsapps -o wide
 
-echo "1️⃣  Vérification des Pods..."
-kubectl get pods -n production -o wide
-echo ""
-
-POD_COUNT=$(kubectl get pods -n production -l app.kubernetes.io/name=frontend-toolsapps --field-selector=status.phase=Running 2>/dev/null | grep -v NAME | wc -l)
-echo "   Pods Running: $POD_COUNT"
-echo ""
-
-if [ "$POD_COUNT" -eq 0 ]; then
-    echo "   ❌ Aucun pod Running!"
-    echo ""
-    echo "   Détails des pods:"
-    kubectl describe pods -n production -l app.kubernetes.io/name=frontend-toolsapps | tail -30
-    exit 1
-fi
-
-echo "2️⃣  Vérification du Service..."
-kubectl get svc -n production
-echo ""
-
-SERVICE_EXISTS=$(kubectl get svc frontend-toolsapps -n production 2>/dev/null | grep -v NAME | wc -l)
-if [ "$SERVICE_EXISTS" -eq 0 ]; then
-    echo "   ❌ Service 'frontend-toolsapps' n'existe pas!"
-    exit 1
-fi
-
-echo "3️⃣  Vérification des Endpoints..."
-kubectl get endpoints frontend-toolsapps -n production
-echo ""
-
-ENDPOINT_COUNT=$(kubectl get endpoints frontend-toolsapps -n production -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null | wc -w)
-echo "   Endpoints disponibles: $ENDPOINT_COUNT"
-
-if [ "$ENDPOINT_COUNT" -eq 0 ]; then
-    echo "   ❌ Aucun endpoint! Les pods ne sont pas connectés au service"
-    echo ""
-    echo "   Vérification des labels:"
-    echo "   Labels du service:"
-    kubectl get svc frontend-toolsapps -n production -o jsonpath='{.spec.selector}' | jq .
-    echo ""
-    echo "   Labels des pods:"
-    kubectl get pods -n production -l app.kubernetes.io/name=frontend-toolsapps -o jsonpath='{.items[0].metadata.labels}' | jq .
-    exit 1
+if [ $? -ne 0 ]; then
+    echo "   ⚠️  Aucun pod avec label app.kubernetes.io/name"
+    echo "   Essai avec autre label..."
+    kubectl get pods -n $NAMESPACE -o wide
 fi
 
 echo ""
-echo "4️⃣  Test direct d'un pod (port 80)..."
-POD_NAME=$(kubectl get pods -n production -l app.kubernetes.io/name=frontend-toolsapps -o jsonpath='{.items[0].metadata.name}')
-echo "   Pod testé: $POD_NAME"
+echo "🔌 2. Vérification du Service..."
+kubectl get svc -n $NAMESPACE $APP_NAME -o yaml | grep -A 5 "selector:"
 
-kubectl exec -n production $POD_NAME -- wget -O- http://localhost:80 2>/dev/null | head -10
+echo ""
+echo "🌐 3. Test direct sur un pod..."
+POD=$(kubectl get pods -n $NAMESPACE --no-headers -o custom-columns=":metadata.name" | head -1)
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "   ✅ Le pod répond correctement sur le port 80"
+if [ -n "$POD" ]; then
+    echo "   Pod sélectionné: $POD"
+    echo "   Test curl sur localhost:80..."
+
+    # Test si curl existe, sinon l'installer
+    kubectl exec -n $NAMESPACE $POD -- which curl > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "   Installation de curl..."
+        kubectl exec -n $NAMESPACE $POD -- sh -c "apk add --no-cache curl 2>/dev/null || apt-get update && apt-get install -y curl 2>/dev/null" > /dev/null 2>&1
+    fi
+
+    # Test HTTP
+    RESULT=$(kubectl exec -n $NAMESPACE $POD -- curl -s -w "\n%{http_code}" http://localhost:80 2>/dev/null)
+    HTTP_CODE=$(echo "$RESULT" | tail -1)
+    CONTENT=$(echo "$RESULT" | head -n -1)
+
+    echo "   Code HTTP: $HTTP_CODE"
+
+    if [ "$HTTP_CODE" = "200" ]; then
+        echo "   ✅ Pod répond 200"
+        echo "   Contenu:"
+        echo "$CONTENT" | head -10
+    elif [ "$HTTP_CODE" = "404" ]; then
+        echo "   ⚠️  Pod répond 404 - Nginx fonctionne mais fichiers manquants"
+        echo "   Vérification de l'image Docker..."
+        kubectl get pods -n $NAMESPACE $POD -o jsonpath='{.spec.containers[0].image}'
+        echo ""
+    else
+        echo "   ❌ Erreur: $HTTP_CODE"
+    fi
 else
-    echo ""
-    echo "   ❌ Le pod ne répond pas sur le port 80"
-    echo ""
-    echo "   Logs du pod:"
-    kubectl logs -n production $POD_NAME --tail=20
-    exit 1
+    echo "   ❌ Aucun pod trouvé!"
 fi
 
 echo ""
-echo "5️⃣  Vérification de l'Ingress..."
-kubectl get ingress frontend-toolsapps -n production
-echo ""
-
-echo "   Configuration de routing:"
-kubectl get ingress frontend-toolsapps -n production -o yaml | grep -A 10 "backend:"
-echo ""
-
-echo "6️⃣  Test du Service en interne..."
-kubectl run -n production test-curl --image=curlimages/curl:latest --rm -i --restart=Never -- \
-  curl -s http://frontend-toolsapps.production.svc.cluster.local:80 | head -10
-
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "   ✅ Le service répond en interne"
-else
-    echo ""
-    echo "   ❌ Le service ne répond pas en interne"
-fi
+echo "🔗 4. Test du Service Kubernetes..."
+echo "   Création d'un pod de test..."
+kubectl run test-service --rm -i --restart=Never --image=curlimages/curl -n $NAMESPACE -- sh -c "curl -s -w '\nHTTP Code: %{http_code}\n' http://$APP_NAME.$NAMESPACE.svc.cluster.local" 2>&1 | tail -20
 
 echo ""
-echo "7️⃣  Logs de l'Ingress Controller..."
-kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller --tail=20 | grep "front.toolsapps.eu"
-echo ""
+echo "🌍 5. Test Ingress externe..."
+curl -I http://front.toolsapps.eu 2>&1 | head -10
 
-echo "================================"
-echo "📝 Diagnostic terminé"
 echo ""
-echo "Si tout est vert ci-dessus, le problème vient probablement"
-echo "de la configuration de l'Ingress qui ne route pas correctement."
+echo "==================================="
+echo "✅ Diagnostic terminé"
+echo ""
+echo "📝 ANALYSE:"
+echo "   - Si pod répond 200 mais Ingress 404 → Problème de routing"
+echo "   - Si pod répond 404 → Problème dans l'image Docker"
+echo "   - Si pod ne répond pas → Problème de port"
 
