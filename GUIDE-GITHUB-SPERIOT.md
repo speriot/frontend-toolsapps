@@ -164,8 +164,13 @@ git config --global credential.helper manager-core
 ### 9️⃣ Maintenant que le dépôt est public, sur votre VPS :
 
 ```bash
-# Se connecter au VPS
+# Se connecter au VPS (en root pour l'installation initiale)
+# C'est plus simple et Hostinger fournit l'accès root par défaut
 ssh root@votre-vps-ip
+# Mot de passe : celui de votre panel Hostinger
+
+# Note: Pour plus de sécurité, vous pourrez créer un user dédié après
+# Voir: helm/SECURITE-VPS-ROOT-VS-USER.md
 
 # Installer l'environnement K3s + Helm (si pas déjà fait)
 wget https://raw.githubusercontent.com/speriot/frontend-toolsapps/main/helm/setup-vps.sh
