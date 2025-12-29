@@ -50,7 +50,7 @@ step "3/10 Installation de K3s (Kubernetes)..."
 if ! command -v kubectl &> /dev/null; then
   curl -sfL https://get.k3s.io | sh -
 
-  # Configuration kubeconfig
+  # Configuration kubeconfigfrontend-toolsapps
   mkdir -p ~/.kube
   cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
   chmod 600 ~/.kube/config
@@ -209,11 +209,22 @@ echo "  ✅ Namespace 'production'"
 echo ""
 echo "📝 Prochaines étapes:"
 echo "  1. Configurer votre DNS: front.toolsapps.eu → $PUBLIC_IP"
-echo "  2. Cloner votre dépôt: git clone <URL>"
+echo ""
+echo "  2a. Option A - Cloner le dépôt (pour avoir les fichiers Helm):"
+echo "      git clone https://github.com/st3ph31/frontend-toolsapps.git"
+echo "      cd frontend-toolsapps"
+echo ""
+echo "  2b. Option B - Copier juste les fichiers Helm depuis votre machine:"
+echo "      scp -r C:\dev\frontend-app\helm root@$PUBLIC_IP:/root/"
+echo ""
 echo "  3. Déployer avec Helm:"
 echo "     helm install frontend-toolsapps ./helm/frontend-toolsapps \\"
 echo "       --namespace production \\"
 echo "       --values ./helm/frontend-toolsapps/values-prod.yaml"
+echo ""
+echo "  Note: L'image Docker (docker.io/st3ph31/frontend-toolsapps:v1.0.0)"
+echo "        sera automatiquement téléchargée depuis Docker Hub par Kubernetes."
+echo "        Le git clone sert UNIQUEMENT à récupérer les fichiers Helm Chart."
 echo ""
 echo "📚 Documentation:"
 echo "  • Guide complet: helm/GUIDE-DEPLOIEMENT-VPS.md"
