@@ -45,9 +45,12 @@ npm run preview
 
 ## 📚 Documentation Complète
 
+- 🎊 **[MISSION-ACCOMPLIE.md](./MISSION-ACCOMPLIE.md)** - 🎉 Célébration du succès et bilan complet
+- 🔄 **[WORKFLOW-MISE-A-JOUR.md](./WORKFLOW-MISE-A-JOUR.md)** - Guide rapide de mise à jour
 - 🎉 **[FELICITATIONS.md](./FELICITATIONS.md)** - Guide de félicitations et premiers pas
 - 📊 **[DEPLOIEMENT-SUCCESS.md](./DEPLOIEMENT-SUCCESS.md)** - Documentation complète du déploiement
 - ⚡ **[COMMANDES-RAPIDES.md](./COMMANDES-RAPIDES.md)** - Référence rapide des commandes VPS
+- 📝 **[RÉSUMÉ-SESSION-29-12-2025.md](./RÉSUMÉ-SESSION-29-12-2025.md)** - Récapitulatif de session
 - 🔧 **[helm/FIX-404-LABELS.md](./helm/FIX-404-LABELS.md)** - Résolution du problème 404 (résolu)
 - ☸️ **[helm/README.md](./helm/README.md)** - Documentation Helm Charts
 
