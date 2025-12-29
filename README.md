@@ -1,197 +1,274 @@
-# Frontend ToolsApps
+# 🚀 Frontend ToolsApps
 
-Application React moderne construite avec Vite, TailwindCSS et déployée sur Kubernetes.
+Application frontend moderne avec React, Vite, Tailwind CSS et React Router.
 
-## 🚀 Démarrage rapide
+[![React](https://img.shields.io/badge/React-19.2.3-blue.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.3.0-646CFF.svg)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.19-38B2AC.svg)](https://tailwindcss.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-### Prérequis
-- Node.js 18+ 
-- npm ou yarn
+---
 
-### Installation
+## 🎯 Quick Start
 
-```bash
-# Installer les dépendances
+### Développement Local
+
+```powershell
+# Installation des dépendances
 npm install
 
-# Lancer le serveur de développement
+# Démarrage du serveur de dev
 npm run dev
-
-# Accéder à http://localhost:3000
 ```
 
-### Build pour la production
+L'application sera disponible sur **http://localhost:3000** avec HMR activé.
 
-```bash
-# Build l'application
+### Build de Production
+
+```powershell
+# Build optimisé
 npm run build
 
 # Prévisualiser le build
 npm run preview
 ```
 
-## 🐋 Docker
+---
 
-### Build de l'image Docker
+## 🐳 Docker
 
-```bash
-# Build l'image
-docker build -t frontend-toolsapps:latest .
+### Déploiement Automatisé (Recommandé)
 
-# Lancer le conteneur
-docker run -p 8080:80 frontend-toolsapps:latest
-
-# Accéder à http://localhost:8080
+```powershell
+# Script automatisé complet
+.\deploy-docker.ps1 -Registry "docker.io/USERNAME" -Tag "v1.0.0"
 ```
 
-### Push vers un registry
+Le script effectue :
+- ✅ Vérification de Docker
+- ✅ Build npm
+- ✅ Build de l'image Docker
+- ✅ Test local
+- ✅ Tag et push vers le registry
 
-```bash
-# Tag l'image
-docker tag frontend-toolsapps:latest myregistry.io/frontend-toolsapps:v1.0.0
+### Build Manuel
 
-# Push vers le registry
-docker push myregistry.io/frontend-toolsapps:v1.0.0
+```powershell
+# Build de l'image
+docker build -t frontend-toolsapps .
+
+# Test local
+docker run -d -p 8080:80 --name frontend-test frontend-toolsapps
+
+# Vérifier
+curl http://localhost:8080
 ```
 
-## ☸️ Déploiement Kubernetes avec Helm
+---
 
-### Depuis le dossier parent
+## 📦 Stack Technique
 
-```bash
-cd ../helm-charts
+| Technologie | Version | Description |
+|-------------|---------|-------------|
+| **React** | 19.2.3 | Framework UI |
+| **React Router** | 7.11.0 | Routing SPA |
+| **Vite** | 7.3.0 | Build tool ultra-rapide |
+| **Tailwind CSS** | 3.4.19 | Framework CSS utilitaire |
+| **Axios** | 1.6.2 | Client HTTP |
+| **Nginx** | Alpine | Serveur web production |
 
-# Déployer avec l'image Docker
-helm upgrade --install frontend ./frontend \
-  --namespace default \
-  --set image.repository=myregistry.io/frontend-toolsapps \
-  --set image.tag=v1.0.0
-```
+---
 
-### Vérifier le déploiement
-
-```bash
-# Voir les pods
-kubectl get pods -n default
-
-# Voir l'ingress
-kubectl get ingress -n default
-
-# Accéder à https://front.toolsapps.eu
-```
-
-## 📦 Stack Technologique
-
-- **React 18** - Bibliothèque UI
-- **Vite 5** - Build tool ultra-rapide
-- **TailwindCSS 3** - Framework CSS utility-first
-- **React Router 6** - Routing côté client
-- **Axios** - Client HTTP
-- **Composants** - Inspirés de shadcn/ui
-
-## 📁 Structure du projet
+## 🏗️ Structure du Projet
 
 ```
 frontend-app/
-├── public/              # Fichiers statiques
 ├── src/
-│   ├── components/      # Composants réutilisables
+│   ├── components/          # Composants réutilisables
 │   │   ├── Button.jsx
 │   │   ├── Card.jsx
 │   │   └── Layout.jsx
-│   ├── pages/           # Pages de l'application
+│   ├── pages/               # Pages de l'application
 │   │   ├── Home.jsx
 │   │   ├── About.jsx
 │   │   └── ApiTest.jsx
-│   ├── App.jsx          # Composant principal
-│   ├── main.jsx         # Point d'entrée
-│   └── index.css        # Styles globaux
-├── Dockerfile           # Multi-stage build
-├── nginx.conf           # Configuration nginx
-└── package.json         # Dépendances npm
+│   ├── App.jsx              # Composant racine avec routing
+│   ├── main.jsx             # Point d'entrée
+│   └── index.css            # Styles globaux + Tailwind
+├── public/                  # Assets statiques
+├── Dockerfile               # Multi-stage build optimisé
+├── nginx.conf               # Config Nginx pour production
+├── deploy-docker.ps1        # Script de déploiement automatisé
+├── verify-before-deploy.ps1 # Script de vérification
+└── vite.config.js           # Config Vite optimisée
 ```
 
-## 🎨 Personnalisation
+---
 
-### Modifier les couleurs
+## 🔧 Configuration
 
-Éditez `tailwind.config.js` et `src/index.css` pour changer le thème.
+### Variables d'Environnement
 
-### Ajouter une page
-
-1. Créer un fichier dans `src/pages/MaPage.jsx`
-2. Ajouter la route dans `src/App.jsx`
-3. Ajouter le lien dans `src/components/Layout.jsx`
-
-### Variables d'environnement
-
-Créer un fichier `.env.local`:
+Créez un fichier `.env.local` :
 
 ```env
 VITE_API_URL=https://api.toolsapps.eu
-VITE_APP_NAME=ToolsApps
 ```
 
-Utiliser dans le code:
+> ⚠️ Les variables `VITE_*` sont intégrées au moment du build, pas au runtime !
 
-```javascript
-const apiUrl = import.meta.env.VITE_API_URL
+### Optimisations Activées
+
+- ✅ **HMR** (Hot Module Replacement) - Rechargement instantané
+- ✅ **Code Splitting** - Chunks séparés pour vendor (React, Router)
+- ✅ **Compression GZIP** - Activée dans Nginx
+- ✅ **Cache HTTP** - Assets statiques cachés 1 an
+- ✅ **Source Maps** - Pour debugging en production
+
+---
+
+## 📋 Scripts Disponibles
+
+| Script | Commande | Description |
+|--------|----------|-------------|
+| **Dev** | `npm run dev` | Serveur de développement avec HMR |
+| **Build** | `npm run build` | Build de production optimisé |
+| **Preview** | `npm run preview` | Prévisualise le build localement |
+| **Lint** | `npm run lint` | Vérifie le code avec ESLint |
+
+---
+
+## 🚀 Déploiement
+
+### 1. Vérification Pré-Déploiement
+
+```powershell
+.\verify-before-deploy.ps1
 ```
 
-## 🔧 Configuration Kubernetes (Helm)
+### 2. Déploiement avec Docker
 
-### values.yaml personnalisé
+```powershell
+# Méthode automatisée
+.\deploy-docker.ps1 -Registry "docker.io/USERNAME" -Tag "v1.0.0"
 
-```yaml
-image:
-  repository: myregistry.io/frontend-toolsapps
-  tag: v1.0.0
-
-replicaCount: 2
-
-env:
-  - name: VITE_API_URL
-    value: "https://api.toolsapps.eu"
-
-configMap:
-  enabled: true
-  data:
-    config.json: |
-      {
-        "apiUrl": "https://api.toolsapps.eu",
-        "environment": "production"
-      }
+# Ou manuellement
+docker build -t frontend-toolsapps:v1.0.0 .
+docker tag frontend-toolsapps:v1.0.0 USERNAME/frontend-toolsapps:v1.0.0
+docker push USERNAME/frontend-toolsapps:v1.0.0
 ```
 
-## 📊 Commandes utiles
+### 3. Sur le Serveur
 
 ```bash
-# Développement
-npm run dev              # Lancer le dev server
-npm run build            # Build pour production
-npm run preview          # Prévisualiser le build
-
-# Docker
-docker build -t frontend .
-docker run -p 8080:80 frontend
-
-# Kubernetes
-kubectl get pods
-kubectl logs -l app.kubernetes.io/name=frontend
-kubectl describe ingress
+# Pull et démarrage
+docker pull USERNAME/frontend-toolsapps:v1.0.0
+docker stop frontend-toolsapps 2>/dev/null || true
+docker rm frontend-toolsapps 2>/dev/null || true
+docker run -d -p 80:80 --name frontend-toolsapps \
+  --restart unless-stopped \
+  USERNAME/frontend-toolsapps:v1.0.0
 ```
 
-## 🌐 Accès
+---
 
-- **Développement**: http://localhost:3000
-- **Production**: https://front.toolsapps.eu
-- **API**: https://api.toolsapps.eu
+## 📚 Documentation Complète
 
-## 📝 License
+| Document | Description |
+|----------|-------------|
+| **GUIDE-DEPLOYMENT-COMPLET.md** | Guide détaillé de déploiement |
+| **CHECKLIST-DEPLOYMENT.md** | Checklist de validation |
+| **DEPLOY.md** | Documentation technique |
+| **QUICKSTART.md** | Guide de démarrage rapide |
 
-Copyright © 2024 Stephane Periot
+---
 
-## 🤝 Contact
+## 🔒 Sécurité
 
-Email: stephane.periot@gmail.com
+- ✅ `.env.local` exclu du contrôle de version
+- ✅ `.dockerignore` configuré
+- ✅ Headers de sécurité HTTP (Nginx)
+- ✅ Dépendances régulièrement mises à jour
+- ✅ Pas de secrets en dur dans le code
+
+---
+
+## ⚠️ Points d'Attention
+
+### Ne PAS Faire
+- ❌ **Upgrader Tailwind vers v4** (breaking changes majeurs)
+- ❌ **Travailler depuis pCloud/OneDrive** (problèmes de performance)
+- ❌ **Committer .env.local** (déjà ignoré par Git)
+
+### Bonnes Pratiques
+- ✅ **Projet sur disque local** (`C:\dev\frontend-app`)
+- ✅ **Utiliser des tags de version** pour Docker
+- ✅ **Tester localement** avant de déployer
+- ✅ **Monitorer les logs** en production
+
+---
+
+## 🐛 Dépannage
+
+### Logs Docker
+
+```bash
+docker logs -f frontend-toolsapps
+```
+
+### Redémarrage
+
+```bash
+docker restart frontend-toolsapps
+```
+
+### Rebuild Complet
+
+```powershell
+.\deploy-docker.ps1 -Registry "registry" -Tag "new-version"
+```
+
+---
+
+## 📊 Monitoring
+
+### Santé du Conteneur
+
+```bash
+# Statut
+docker ps --filter name=frontend-toolsapps
+
+# Ressources
+docker stats frontend-toolsapps
+
+# Inspection détaillée
+docker inspect frontend-toolsapps
+```
+
+---
+
+## 🤝 Support
+
+Pour toute question ou problème :
+1. Consultez la documentation dans `GUIDE-DEPLOYMENT-COMPLET.md`
+2. Vérifiez les logs Docker
+3. Lancez `.\verify-before-deploy.ps1` pour diagnostiquer
+
+---
+
+## 📄 License
+
+Propriétaire - ToolsApps © 2025
+
+---
+
+## 🎊 Status
+
+✅ **Production Ready**  
+✅ Docker testé et validé  
+✅ Documentation complète  
+✅ Scripts automatisés  
+✅ Optimisations activées
+
+**Prêt pour le déploiement !** 🚀
 
