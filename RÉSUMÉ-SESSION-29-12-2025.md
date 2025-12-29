@@ -9,7 +9,7 @@
 
 ---
 
-## 📋 PROBLÈMES RÉSOLUS (11 au total)
+## 📋 PROBLÈMES RÉSOLUS (12 au total)
 
 ### 1. ❌ Erreur `npm install` (package.json invalide)
 **Symptôme :** `JSONParseError: Unexpected non-whitespace character`  
@@ -76,6 +76,12 @@
 **Cause :** Timeout ou problème réseau temporaire  
 **Solution :** Test externe fonctionne, problème non bloquant  
 **Status :** ⚠️ Non bloquant (Ingress fonctionne)
+
+### 12. ❌ HTTPS retourne 404 (HTTP fonctionne)
+**Symptôme :** HTTP 200 OK mais HTTPS 404 Not Found  
+**Cause :** Configuration Ingress HTTPS mal routée vers le backend  
+**Solution :** Reconfiguration Ingress avec bonnes annotations + redémarrage Ingress Controller  
+**Status :** 🔄 En cours de résolution
 
 ---
 
@@ -174,6 +180,8 @@
 - ✅ `helm/deep-diagnose-ssl.sh` - Diagnostic SSL approfondi
 - ✅ `helm/ultimate-fix-ssl.sh` - Solution ultime SSL
 - ✅ `helm/complete-cleanup-ssl.sh` - Nettoyage SSL complet
+- ✅ `helm/diagnose-https-404.sh` - Diagnostic HTTPS 404
+- ✅ `helm/fix-https-404.sh` - Correction HTTPS 404
 
 ### Documentation
 - ✅ `README.md` - Documentation principale (mise à jour)
@@ -181,6 +189,7 @@
 - ✅ `DEPLOIEMENT-SUCCESS.md` - Documentation technique complète
 - ✅ `COMMANDES-RAPIDES.md` - Référence commandes VPS
 - ✅ `helm/FIX-404-LABELS.md` - Solution problème 404
+- ✅ `helm/SOLUTION-HTTPS-404.md` - Solution problème HTTPS 404
 - ✅ `helm/README.md` - Documentation Helm Charts
 - ✅ `RÉSUMÉ-SESSION-29-12-2025.md` - Ce document
 
@@ -294,9 +303,9 @@
 | 20:30 | **APPLICATION LIVE !** | 🎉 |
 
 **Durée totale :** ~4 heures  
-**Problèmes résolus :** 11  
-**Scripts créés :** 14  
-**Documents créés :** 7
+**Problèmes résolus :** 11 (+ 1 en cours)  
+**Scripts créés :** 16  
+**Documents créés :** 8
 
 ---
 
@@ -340,13 +349,13 @@ Vous avez réalisé un **déploiement professionnel de niveau SRE** avec :
 
 ### Statistiques Impressionnantes
 
-- 📦 **11 problèmes** résolus
-- 🛠️ **14 scripts** automatisés créés
-- 📚 **7 documents** de documentation
+- 📦 **12 problèmes** identifiés (11 résolus + 1 en cours)
+- 🛠️ **16 scripts** automatisés créés
+- 📚 **8 documents** de documentation
 - ☸️ **8 ressources** Kubernetes déployées
 - 🐳 **1 image Docker** optimisée (30 MB)
 - ⏱️ **~4 heures** de session intensive
-- 🎯 **100%** de succès !
+- 🎯 **92%** de succès (11/12 résolus)
 
 ---
 
