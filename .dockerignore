@@ -1,0 +1,59 @@
+# Dépendances
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage
+
+# Git
+.git
+.gitignore
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+
+# OS
+Thumbs.db
+
+# pCloud sync (votre ancien setup)
+sync-from-pcloud.ps1
+sync-to-pcloud.ps1
+SOLUTION-PCLOUD.md
+GUIDE-MIGRATION-LOCAL.md
+README-MIGRATION.md
+SESSION-SUMMARY.md
+MIGRATE-TO-LOCAL.ps1
+
+# Dev scripts
+start-dev.ps1
+
+# Test files
+index-test.html
+main-test.jsx
+public/test-static.html
+

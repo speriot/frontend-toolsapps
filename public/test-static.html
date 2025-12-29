@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Statique - Pas de React</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; }
+        .time {
+            font-size: 24px;
+            font-weight: bold;
+            color: #059669;
+            margin: 20px 0;
+        }
+        .info {
+            background: #fef3c7;
+            padding: 15px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 Test de Rafraîchissement</h1>
+        <p>Cette page est du HTML pur, sans React, sans Vite HMR.</p>
+
+        <div class="info">
+            <strong>⚠️ IMPORTANT :</strong> Si cette page se rafraîchit toute seule, le problème vient de :
+            <ul>
+                <li>Une extension de navigateur (LiveReload, Auto Refresh, etc.)</li>
+                <li>Votre antivirus</li>
+                <li>Un logiciel de synchronisation (OneDrive, Dropbox)</li>
+            </ul>
+        </div>
+
+        <p><strong>Heure de chargement :</strong></p>
+        <div class="time" id="time"></div>
+
+        <p><strong>Nombre de rafraîchissements détectés :</strong></p>
+        <div class="time" id="count">0</div>
+    </div>
+
+    <script>
+        // Afficher l'heure de chargement
+        document.getElementById('time').textContent = new Date().toLocaleTimeString();
+
+        // Compter les rafraîchissements
+        let count = parseInt(localStorage.getItem('refreshCount') || '0');
+        count++;
+        localStorage.setItem('refreshCount', count.toString());
+        document.getElementById('count').textContent = count;
+
+        // Réinitialiser le compteur après 10 secondes de stabilité
+        setTimeout(() => {
+            localStorage.setItem('refreshCount', '0');
+        }, 10000);
+
+        console.log('Page chargée à:', new Date().toLocaleTimeString());
+        console.log('Nombre de rafraîchissements:', count);
+    </script>
+</body>
+</html>
+
