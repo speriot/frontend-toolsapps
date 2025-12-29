@@ -52,12 +52,6 @@ ingress:
     # Optimisations de performance
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-    # Cache des assets statiques
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-      }
   hosts:
     - host: front.toolsapps.eu
       paths:
