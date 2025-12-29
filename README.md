@@ -1,11 +1,19 @@
 # 🚀 Frontend ToolsApps
 
-Application frontend moderne avec React, Vite, Tailwind CSS et React Router.
+Application frontend moderne déployée en production avec React, Vite, Tailwind CSS et Kubernetes.
 
-[![React](https://img.shields.io/badge/React-19.2.3-blue.svg)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.3.0-646CFF.svg)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4.21-646CFF.svg)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.19-38B2AC.svg)](https://tailwindcss.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-326CE5.svg)](https://kubernetes.io/)
+[![Production](https://img.shields.io/badge/Status-Live-success.svg)](https://front.toolsapps.eu)
+
+## 🌐 Application en Production
+
+**URL Production :** https://front.toolsapps.eu  
+**Status :** 🟢 Opérationnel  
+**Déployé le :** 29 Décembre 2025
 
 ---
 
@@ -32,6 +40,16 @@ npm run build
 # Prévisualiser le build
 npm run preview
 ```
+
+---
+
+## 📚 Documentation Complète
+
+- 🎉 **[FELICITATIONS.md](./FELICITATIONS.md)** - Guide de félicitations et premiers pas
+- 📊 **[DEPLOIEMENT-SUCCESS.md](./DEPLOIEMENT-SUCCESS.md)** - Documentation complète du déploiement
+- ⚡ **[COMMANDES-RAPIDES.md](./COMMANDES-RAPIDES.md)** - Référence rapide des commandes VPS
+- 🔧 **[helm/FIX-404-LABELS.md](./helm/FIX-404-LABELS.md)** - Résolution du problème 404 (résolu)
+- ☸️ **[helm/README.md](./helm/README.md)** - Documentation Helm Charts
 
 ---
 
@@ -138,7 +156,72 @@ VITE_API_URL=https://api.toolsapps.eu
 
 ---
 
-## 🚀 Déploiement
+## ☸️ Déploiement Kubernetes + Helm
+
+### Architecture Production
+
+L'application est déployée sur un VPS Hostinger avec :
+- **Kubernetes (K3s)** - Orchestration
+- **Helm Charts** - Gestion des déploiements
+- **Nginx Ingress** - Reverse proxy et Load Balancer
+- **cert-manager** - Certificats SSL/TLS automatiques (Let's Encrypt)
+- **3 réplicas** - Haute disponibilité
+- **Autoscaling** - Scale de 2 à 5 pods selon la charge
+
+### Déploiement Initial
+
+```bash
+# Sur le VPS
+cd ~/frontend-toolsapps
+./helm/deploy-app.sh
+```
+
+### Mise à jour de l'application
+
+**Sur votre machine locale :**
+```powershell
+# 1. Build et push de la nouvelle image
+.\deploy-docker.ps1 -Registry "docker.io/st3ph31" -Tag "v1.0.1"
+
+# 2. Commit et push des changements
+git add .
+git commit -m "feat: New feature"
+git push
+```
+
+**Sur le VPS :**
+```bash
+# 3. Récupérer les changements et redéployer
+cd ~/frontend-toolsapps
+git pull origin main
+
+helm upgrade frontend-toolsapps ./helm/frontend-toolsapps \
+  --namespace production \
+  --set image.tag=v1.0.1 \
+  --wait
+```
+
+### Commandes Kubernetes Utiles
+
+```bash
+# Voir les pods
+kubectl get pods -n production
+
+# Voir les logs
+kubectl logs -n production -l app.kubernetes.io/name=frontend-toolsapps
+
+# Redémarrer l'application
+kubectl rollout restart deployment/frontend-toolsapps -n production
+
+# Vérification complète
+./helm/verify-deployment.sh
+```
+
+Consultez **[COMMANDES-RAPIDES.md](./COMMANDES-RAPIDES.md)** pour plus de commandes.
+
+---
+
+## 🚀 Déploiement Docker Simple
 
 ### 1. Vérification Pré-Déploiement
 
