@@ -1,0 +1,13 @@
+# Patterns to ignore when building packages.
+# Similar to .gitignore
+.git
+.gitignore
+.DS_Store
+*.sw?
+*.orig
+*.rej
+*~
+.idea/
+*.iml
+.vscode/
+

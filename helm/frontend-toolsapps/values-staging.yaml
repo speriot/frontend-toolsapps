@@ -1,0 +1,38 @@
+# Overrides for staging environment
+replicaCount: 2
+
+image:
+  tag: "v1.0.0"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 384Mi
+  requests:
+    cpu: 150m
+    memory: 192Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+
+ingress:
+  enabled: true
+  hosts:
+    - host: staging.front.toolsapps.eu
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: frontend-toolsapps-staging-tls
+      hosts:
+        - staging.front.toolsapps.eu
+
+env:
+  - name: VITE_API_URL
+    value: "https://staging.api.toolsapps.eu"
+  - name: NODE_ENV
+    value: "staging"
+

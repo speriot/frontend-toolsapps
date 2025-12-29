@@ -7,7 +7,7 @@ param(
 )
 
 $ImageName = "frontend-toolsapps"
-$FullImageName = "$Registry/$ImageName:$Tag"
+$FullImageName = "$Registry/$ImageName" + ":" + "$Tag"
 
 Write-Host "🚀 Déploiement de Frontend ToolsApps" -ForegroundColor Cyan
 Write-Host "======================================" -ForegroundColor Cyan
@@ -36,12 +36,13 @@ Write-Host "   ✅ Build npm réussi" -ForegroundColor Green
 # Build de l'image Docker
 Write-Host ""
 Write-Host "3️⃣  Build de l'image Docker..." -ForegroundColor Yellow
-docker build -t $ImageName:$Tag .
+$LocalImageTag = "${ImageName}:${Tag}"
+docker build -t $LocalImageTag .
 if ($LASTEXITCODE -ne 0) {
     Write-Host "   ❌ Erreur lors du build Docker" -ForegroundColor Red
     exit 1
 }
-Write-Host "   ✅ Image Docker créée: $ImageName:$Tag" -ForegroundColor Green
+Write-Host "   ✅ Image Docker créée: $LocalImageTag" -ForegroundColor Green
 
 # Test local (optionnel)
 Write-Host ""
@@ -53,7 +54,7 @@ docker stop $TestContainer 2>$null | Out-Null
 docker rm $TestContainer 2>$null | Out-Null
 
 # Lancer le conteneur de test
-docker run -d -p 8888:80 --name $TestContainer $ImageName:$Tag
+docker run -d -p 8888:80 --name $TestContainer $LocalImageTag
 if ($LASTEXITCODE -ne 0) {
     Write-Host "   ❌ Erreur lors du lancement du conteneur de test" -ForegroundColor Red
     exit 1
@@ -83,7 +84,7 @@ docker rm $TestContainer | Out-Null
 # Tag pour le registry
 Write-Host ""
 Write-Host "5️⃣  Tag de l'image pour le registry..." -ForegroundColor Yellow
-docker tag $ImageName:$Tag $FullImageName
+docker tag $LocalImageTag $FullImageName
 if ($LASTEXITCODE -ne 0) {
     Write-Host "   ❌ Erreur lors du tag" -ForegroundColor Red
     exit 1
@@ -112,7 +113,7 @@ Write-Host ""
 Write-Host "======================================" -ForegroundColor Cyan
 Write-Host "✅ Déploiement terminé!" -ForegroundColor Green
 Write-Host ""
-Write-Host "📦 Image locale : $ImageName:$Tag" -ForegroundColor White
+Write-Host "📦 Image locale : $LocalImageTag" -ForegroundColor White
 Write-Host "📦 Image registry : $FullImageName" -ForegroundColor White
 Write-Host ""
 Write-Host "🚀 Commandes pour déployer sur le serveur:" -ForegroundColor Cyan
