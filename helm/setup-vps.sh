@@ -88,9 +88,22 @@ step "6/10 Installation de NGINX Ingress Controller..."
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
-# Obtenir l'IP publique du VPS
-PUBLIC_IP=$(curl -s ifconfig.me)
+# Obtenir l'IP publique du VPS (forcer IPv4)
+PUBLIC_IP=$(curl -4 -s ifconfig.me 2>/dev/null || curl -s api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')
 echo "IP publique détectée: $PUBLIC_IP"
+
+# Vérifier si c'est une IPv4 valide
+if [[ ! $PUBLIC_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+  echo -e "${YELLOW}⚠️  IPv6 ou IP invalide détectée: $PUBLIC_IP${NC}"
+  echo -e "${YELLOW}   Tentative de récupération de l'IPv4...${NC}"
+  PUBLIC_IP=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '127.0.0.1' | head -n 1)
+  if [[ -n $PUBLIC_IP ]]; then
+    echo -e "${GREEN}   IPv4 trouvée: $PUBLIC_IP${NC}"
+  else
+    echo -e "${RED}   ❌ Impossible de détecter l'IPv4${NC}"
+    read -p "   Entrez manuellement votre IPv4 publique: " PUBLIC_IP
+  fi
+fi
 
 # Vérifier si déjà installé
 if helm list -n ingress-nginx | grep -q ingress-nginx; then
