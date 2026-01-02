@@ -104,8 +104,8 @@ export default function About() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Email: <a href="mailto:stephane.periot@gmail.com" className="text-primary hover:underline">
-              stephane.periot@gmail.com
+            Email: <a href="mailto:yyy.xx@gmail.com" className="text-primary hover:underline">
+            yyy.xx@gmail.com
             </a>
           </p>
         </CardContent>
