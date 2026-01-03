@@ -25,7 +25,6 @@ ingress:
   className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
 
 podDisruptionBudget:
   enabled: true

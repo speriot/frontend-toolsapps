@@ -47,7 +47,6 @@ ingress:
   className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
     # Optimisations de performance
     traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
   hosts:
