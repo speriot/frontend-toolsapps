@@ -47,8 +47,6 @@ ingress:
   className: "traefik"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    # Optimisations de performance
-    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
   hosts:
     - host: front.toolsapps.eu
       paths:
