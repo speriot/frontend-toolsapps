@@ -6,7 +6,7 @@ Chart Helm professionnel pour déployer l'application Frontend ToolsApps sur Kub
 
 - Kubernetes 1.24+
 - Helm 3.10+
-- Ingress Controller NGINX installé
+- Traefik Ingress Controller installé
 - cert-manager (pour SSL automatique avec Let's Encrypt)
 
 ## 🚀 Installation Rapide
@@ -46,6 +46,7 @@ helm install frontend-toolsapps ./helm/frontend-toolsapps \
 | `image.tag` | Tag de l'image | `v1.0.0` |
 | `service.type` | Type de service K8s | `ClusterIP` |
 | `ingress.enabled` | Activer l'Ingress | `true` |
+| `ingress.className` | Classe Ingress (traefik) | `traefik` |
 | `ingress.hosts[0].host` | Nom de domaine | `front.toolsapps.eu` |
 | `autoscaling.enabled` | Activer l'autoscaling | `true` |
 | `autoscaling.minReplicas` | Réplicas minimum | `2` |
@@ -117,8 +118,32 @@ securityContext:
 ### Network Policy
 
 Les Network Policies limitent le trafic réseau :
-- **Ingress** : Uniquement depuis l'Ingress Controller
+- **Ingress** : Uniquement depuis Traefik Ingress Controller
 - **Egress** : Uniquement vers l'API backend et DNS
+
+## 🌐 Traefik Configuration
+
+### Ingress Controller
+
+Ce chart utilise **Traefik** comme Ingress Controller avec :
+- Redirection automatique HTTP → HTTPS
+- Certificats SSL Let's Encrypt via cert-manager
+- Support des middlewares Traefik
+
+### Annotations Traefik
+
+Exemples d'annotations disponibles :
+
+```yaml
+ingress:
+  annotations:
+    # Certificat SSL automatique
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Middleware de redirection HTTPS
+    traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-https@kubernetescrd"
+    # Points d'entrée
+    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+```
 
 ## 📊 Monitoring et Observabilité
 
@@ -260,6 +285,23 @@ kubectl exec -it deployment/frontend-toolsapps -- /bin/sh
 
 ```bash
 kubectl get events --sort-by='.lastTimestamp'
+```
+
+### Vérifier SSL/TLS
+
+```bash
+# Vérifier le certificat Let's Encrypt
+kubectl get certificate -n production
+kubectl describe certificate frontend-toolsapps-tls -n production
+
+# Vérifier le secret TLS
+kubectl get secret frontend-toolsapps-tls -n production
+
+# Logs Traefik
+kubectl logs -n traefik deployment/traefik -f
+
+# Logs cert-manager
+kubectl logs -n cert-manager deployment/cert-manager -f
 ```
 
 ## 🗑️ Désinstallation

@@ -345,7 +345,7 @@ Ouvrez : **https://front.toolsapps.eu**
 # Nouvelle version
 helm upgrade frontend-toolsapps helm/frontend-toolsapps \
   --namespace production \
-  --set image.tag=v1.0.1 \
+  --set image.tag=v1.1.0 \
   --reuse-values
 
 # Vérifier le rollout
