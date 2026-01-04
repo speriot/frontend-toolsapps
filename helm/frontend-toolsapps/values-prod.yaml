@@ -31,7 +31,7 @@ podDisruptionBudget:
   minAvailable: 2
 
 networkPolicy:
-  enabled: true
+  enabled: false
 
 env:
   - name: VITE_API_URL
