@@ -2,7 +2,7 @@
 replicaCount: 3
 
 image:
-  tag: "v1.2.0"
+  tag: "v1.2.1"
   pullPolicy: Always
 
 resources:
@@ -38,5 +38,6 @@ env:
     value: "https://api.toolsapps.eu"
   - name: NODE_ENV
     value: "production"
+
 
 
