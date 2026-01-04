@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '../components/Card'
 import Button from '../components/Button'
 
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev'
+
 export default function Home() {
   return (
     <div className="space-y-12">
@@ -30,6 +32,19 @@ export default function Home() {
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Une application moderne construite avec React 19, Vite, TailwindCSS et déployée sur Kubernetes
         </p>
+        
+        {/* Version Badge */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center justify-center gap-2"
+        >
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            v{APP_VERSION}
+          </span>
+        </motion.div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

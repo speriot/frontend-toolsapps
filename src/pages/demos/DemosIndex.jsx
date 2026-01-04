@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Rocket, UserCircle, ListTodo,
-  MessageSquare, ShoppingBag, ArrowRight, Sparkles, Puzzle, Table, BookOpen
+  MessageSquare, ShoppingBag, ArrowRight, Sparkles, Puzzle, Table, BookOpen, Radio
 } from 'lucide-react'
 
 const demos = [
@@ -87,6 +87,15 @@ const demos = [
     path: '/demos/irregular-verbs',
     tags: ['Éducation', 'Quiz', 'Anglais']
   },
+  {
+    id: 'portal',
+    title: 'Portail IoT',
+    description: 'Tableau de bord en temps réel pour surveiller l\'état du portail via MQTT (HiveMQ Cloud).',
+    icon: Radio,
+    color: 'from-indigo-500 to-blue-600',
+    path: '/demos/portal',
+    tags: ['IoT', 'MQTT', 'Real-time']
+  },
 ]
 
 function DemoCard({ demo, index }) {
@@ -133,7 +142,7 @@ function DemoCard({ demo, index }) {
           </div>
 
           {/* Background decoration */}
-          <div className={`absolute -bottom-4 -right-4 w-32 h-32 rounded-full bg-gradient-to-br ${demo.color} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity`} />
+          <div className={`absolute -bottom-4 -right-4 w-48 h-48 rounded-full bg-gradient-to-br ${demo.color} opacity-10 blur-2xl group-hover:opacity-30 transition-opacity`} />
         </motion.div>
       </Link>
     </motion.div>

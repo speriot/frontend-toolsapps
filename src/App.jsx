@@ -15,6 +15,7 @@ import EcommerceDemo from './pages/demos/EcommerceDemo'
 import ComponentsDemo from './pages/demos/ComponentsDemo'
 import TablesDemo from './pages/demos/TablesDemo'
 import IrregularVerbsDemo from './pages/demos/IrregularVerbsDemo'
+import PortalDashboard from './pages/demos/PortalDashboard'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/demos/components" element={<ComponentsDemo />} />
         <Route path="/demos/tables" element={<TablesDemo />} />
         <Route path="/demos/irregular-verbs" element={<IrregularVerbsDemo />} />
+        <Route path="/demos/portal" element={<PortalDashboard />} />
       </Routes>
     </Layout>
   )

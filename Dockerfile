@@ -12,6 +12,10 @@ RUN npm ci
 # Copier le code source
 COPY . .
 
+# Argument de build pour la version (injecté depuis package.json)
+ARG APP_VERSION
+ENV VITE_APP_VERSION=${APP_VERSION}
+
 # Build de l'application
 RUN npm run build
 
