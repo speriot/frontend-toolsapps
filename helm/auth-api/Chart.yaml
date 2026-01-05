@@ -1,0 +1,17 @@
+apiVersion: v2
+name: auth-api
+description: A Helm chart for Auth API - Node.js JWT Authentication Service
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - auth
+  - api
+  - jwt
+  - nodejs
+  - authentication
+maintainers:
+  - name: ToolsApps Team
+    email: contact@toolsapps.eu
+sources:
+  - https://github.com/st3ph31/auth-api

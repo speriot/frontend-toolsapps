@@ -1,5 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
+import Login from './pages/Login'
 import Home from './pages/Home'
 import About from './pages/About'
 import ApiTest from './pages/ApiTest'
@@ -19,26 +21,42 @@ import PortalDashboard from './pages/demos/PortalDashboard'
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/api-test" element={<ApiTest />} />
+    <Routes>
+      {/* Route publique de connexion */}
+      <Route path="/login" element={<Login />} />
 
-        {/* Demo Routes */}
-        <Route path="/demos" element={<DemosIndex />} />
-        <Route path="/demos/dashboard" element={<DashboardDemo />} />
-        <Route path="/demos/landing" element={<LandingDemo />} />
-        <Route path="/demos/auth" element={<AuthDemo />} />
-        <Route path="/demos/tasks" element={<TasksDemo />} />
-        <Route path="/demos/social" element={<SocialDemo />} />
-        <Route path="/demos/ecommerce" element={<EcommerceDemo />} />
-        <Route path="/demos/components" element={<ComponentsDemo />} />
-        <Route path="/demos/tables" element={<TablesDemo />} />
-        <Route path="/demos/irregular-verbs" element={<IrregularVerbsDemo />} />
-        <Route path="/demos/portal" element={<PortalDashboard />} />
-      </Routes>
-    </Layout>
+      {/* Routes protégées avec Layout */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/api-test" element={<ApiTest />} />
+
+                {/* Demo Routes */}
+                <Route path="/demos" element={<DemosIndex />} />
+                <Route path="/demos/dashboard" element={<DashboardDemo />} />
+                <Route path="/demos/landing" element={<LandingDemo />} />
+                <Route path="/demos/auth" element={<AuthDemo />} />
+                <Route path="/demos/tasks" element={<TasksDemo />} />
+                <Route path="/demos/social" element={<SocialDemo />} />
+                <Route path="/demos/ecommerce" element={<EcommerceDemo />} />
+                <Route path="/demos/components" element={<ComponentsDemo />} />
+                <Route path="/demos/tables" element={<TablesDemo />} />
+                <Route path="/demos/irregular-verbs" element={<IrregularVerbsDemo />} />
+                <Route path="/demos/portal" element={<PortalDashboard />} />
+
+                {/* Redirection par défaut */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   )
 }
 

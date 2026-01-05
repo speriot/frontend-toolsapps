@@ -1,6 +1,6 @@
 # 🚀 Frontend ToolsApps
 
-Application frontend moderne déployée en production avec React, Vite, Tailwind CSS et Kubernetes.
+Application frontend moderne **avec authentification sécurisée** déployée en production avec React, Vite, Tailwind CSS et Kubernetes.
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.21-646CFF.svg)](https://vitejs.dev/)
@@ -8,12 +8,14 @@ Application frontend moderne déployée en production avec React, Vite, Tailwind
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-326CE5.svg)](https://kubernetes.io/)
 [![Production](https://img.shields.io/badge/Status-Live-success.svg)](https://front.toolsapps.eu)
+[![Authentication](https://img.shields.io/badge/Auth-JWT-orange.svg)](https://jwt.io/)
 
 ## 🌐 Application en Production
 
 **URL Production :** https://front.toolsapps.eu  
 **Status :** 🟢 Opérationnel  
-**Déployé le :** 29 Décembre 2025
+**Déployé le :** 29 Décembre 2025  
+**🔐 Authentification :** Activée (JWT + Kubernetes Secrets)
 
 ---
 
@@ -25,11 +27,16 @@ Application frontend moderne déployée en production avec React, Vite, Tailwind
 # Installation des dépendances
 npm install
 
+# Installation backend auth (première fois)
+cd backend-auth
+npm install
+cd ..
+
 # Démarrage du serveur de dev
 npm run dev
 ```
 
-L'application sera disponible sur **http://localhost:3000** avec HMR activé.
+L'application sera disponible sur **http://localhost:5173** avec HMR activé.
 
 ### Build de Production
 
@@ -40,6 +47,29 @@ npm run build
 # Prévisualiser le build
 npm run preview
 ```
+
+---
+
+## 🔐 Authentification
+
+Cette application est protégée par un système d'authentification JWT complet.
+
+### Documentation d'authentification
+
+- 🚀 **[QUICKSTART-AUTH.md](./QUICKSTART-AUTH.md)** - Démarrage rapide (5 min)
+- 📖 **[GUIDE-AUTHENTIFICATION.md](./GUIDE-AUTHENTIFICATION.md)** - Guide complet
+- 📋 **[TODO-DEPLOIEMENT-AUTH.md](./TODO-DEPLOIEMENT-AUTH.md)** - Checklist de déploiement
+- 🔧 **[RESUME-IMPLEMENTATION-AUTH.md](./RESUME-IMPLEMENTATION-AUTH.md)** - Détails techniques
+
+### Pages protégées
+
+Toutes les pages nécessitent une authentification :
+- ✅ `/` - Accueil
+- ✅ `/about` - À propos  
+- ✅ `/api-test` - Test de l'API
+- ✅ `/demos/*` - Toutes les pages de démos
+
+Seule la page `/login` est publique.
 
 ---
 

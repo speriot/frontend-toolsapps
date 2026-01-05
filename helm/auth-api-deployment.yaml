@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-api
+  namespace: default
+  labels:
+    app: auth-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-api
+  template:
+    metadata:
+      labels:
+        app: auth-api
+    spec:
+      containers:
+      - name: auth-api
+        image: st3ph31/auth-api:v1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+          name: http
+        env:
+        - name: PORT
+          value: "3001"
+        - name: NODE_ENV
+          value: "production"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-jwt
+              key: jwt-secret
+        - name: USERS_FILE
+          value: "/app/secrets/users.json"
+        volumeMounts:
+        - name: users-secret
+          mountPath: /app/secrets
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+      volumes:
+      - name: users-secret
+        secret:
+          secretName: auth-users
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-api
+  namespace: default
+  labels:
+    app: auth-api
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-api
+  ports:
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-api
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.toolsapps.eu
+    secretName: api-tls
+  rules:
+  - host: api.toolsapps.eu
+    http:
+      paths:
+      - path: /api/auth
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-api
+            port:
+              number: 3001
+      - path: /api/health
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-api
+            port:
+              number: 3001

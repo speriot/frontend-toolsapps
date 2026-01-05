@@ -1,0 +1,121 @@
+# Default values for auth-api
+replicaCount: 2
+
+image:
+  repository: st3ph31/auth-api
+  pullPolicy: IfNotPresent
+  tag: "v1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3001
+  targetPort: 3001
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: api.toolsapps.eu
+      paths:
+        - path: /frontend-auth
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.toolsapps.eu
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configuration de l'application
+env:
+  - name: PORT
+    value: "3001"
+  - name: NODE_ENV
+    value: "production"
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: auth-jwt
+        key: jwt-secret
+  - name: USERS_FILE
+    value: "/app/secrets/users.json"
+
+# Montage des secrets
+volumes:
+  - name: users-secret
+    secret:
+      secretName: auth-users
+
+volumeMounts:
+  - name: users-secret
+    mountPath: /app/secrets
+    readOnly: true
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 3001
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 3001
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

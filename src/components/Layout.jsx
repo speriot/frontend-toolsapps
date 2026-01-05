@@ -1,9 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { LogOut, User } from 'lucide-react'
 
 export default function Layout({ children }) {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, logout } = useAuth()
 
   const isActive = (path) => {
     if (path === '/demos') {
@@ -30,18 +33,38 @@ export default function Layout({ children }) {
             </Link>
 
             {/* Desktop Navigation */}
-            <ul className="hidden md:flex gap-6">
-              {navLinks.map(link => (
-                <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className={`transition-colors ${isActive(link.path)}`}
+            <div className="hidden md:flex items-center gap-6">
+              <ul className="flex gap-6">
+                {navLinks.map(link => (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      className={`transition-colors ${isActive(link.path)}`}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {/* User Info & Logout */}
+              {user && (
+                <div className="flex items-center gap-3 ml-4 pl-4 border-l">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{user.name || user.email}</span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm hover:bg-muted transition-colors"
+                    title="Déconnexion"
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                    <LogOut className="w-4 h-4" />
+                    <span>Déconnexion</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -60,19 +83,41 @@ export default function Layout({ children }) {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <ul className="md:hidden pt-4 pb-2 space-y-2">
-              {navLinks.map(link => (
-                <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className={`block py-2 transition-colors ${isActive(link.path)}`}
-                    onClick={() => setMobileMenuOpen(false)}
+            <div className="md:hidden pt-4 pb-2 space-y-2">
+              <ul className="space-y-2">
+                {navLinks.map(link => (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      className={`block py-2 transition-colors ${isActive(link.path)}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              
+              {/* Mobile User Info & Logout */}
+              {user && (
+                <div className="pt-2 mt-2 border-t space-y-2">
+                  <div className="flex items-center gap-2 text-sm py-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{user.name || user.email}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout()
+                      setMobileMenuOpen(false)
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-muted transition-colors w-full"
                   >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                    <LogOut className="w-4 h-4" />
+                    <span>Déconnexion</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </header>

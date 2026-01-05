@@ -1,0 +1,15 @@
+# Backend Auth - Ne pas committer les secrets !
+backend-auth/users.json
+backend-auth/node_modules/
+backend-auth/.env
+backend-auth/.env.local
+
+# Fichiers de secrets temporaires
+users.json
+*.secret
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
