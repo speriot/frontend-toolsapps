@@ -99,7 +99,7 @@ volumeMounts:
 # Health checks
 livenessProbe:
   httpGet:
-    path: /api/health
+    path: /frontend-auth/health
     port: 3001
   initialDelaySeconds: 10
   periodSeconds: 30
@@ -108,7 +108,7 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /api/health
+    path: /frontend-auth/health
     port: 3001
   initialDelaySeconds: 5
   periodSeconds: 10
