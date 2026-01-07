@@ -1,0 +1,18 @@
+apiVersion: v2
+name: mqtt-sse-bridge
+description: A Helm chart for MQTT to SSE Bridge - Server-Sent Events proxy for MQTT broker
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - mqtt
+  - sse
+  - server-sent-events
+  - nodejs
+  - iot
+  - portal
+maintainers:
+  - name: ToolsApps Team
+    email: contact@toolsapps.eu
+sources:
+  - https://github.com/st3ph31/mqtt-sse-bridge

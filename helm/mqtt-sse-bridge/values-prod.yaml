@@ -1,0 +1,54 @@
+# Overrides for production environment
+replicaCount: 2
+
+image:
+  tag: "v1.0.0"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 512Mi
+  requests:
+    cpu: 150m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Important pour SSE : désactiver le buffering
+    traefik.ingress.kubernetes.io/buffering: "off"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: false
+
+env:
+  - name: PORT
+    value: "3003"
+  - name: NODE_ENV
+    value: "production"
+  - name: MQTT_HOST
+    value: "wss://3d3f4f89176c45f38dab27f19cc275b4.s1.eu.hivemq.cloud:8884/mqtt"
+  - name: MQTT_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: mqtt-credentials
+        key: username
+  - name: MQTT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mqtt-credentials
+        key: password

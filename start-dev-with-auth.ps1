@@ -80,12 +80,18 @@ function Start-BackgroundProcess {
 
 # Démarrer le backend en arrière-plan
 Write-Host "🔧 Démarrage du backend API..." -ForegroundColor Yellow
-$env:PORT = "3002"
-$env:JWT_SECRET = "dev-secret-key-change-in-production"
-$env:USERS_FILE = ".\users-dev.json"
 
 $backendDir = Join-Path $PSScriptRoot "backend-auth"
-$backendProcess = Start-Process -FilePath "npm" -ArgumentList "start" -WorkingDirectory $backendDir -PassThru
+
+# Créer un job PowerShell pour le backend avec les bonnes variables d'environnement
+$backendJob = Start-Job -ScriptBlock {
+    param($dir)
+    Set-Location $dir
+    $env:PORT = "3002"
+    $env:JWT_SECRET = "dev-secret-key-change-in-production"
+    $env:USERS_FILE = ".\users-dev.json"
+    node server.js
+} -ArgumentList $backendDir
 
 Start-Sleep -Seconds 3
 
@@ -109,5 +115,6 @@ npm run dev
 # Cleanup: arrêter le backend quand le frontend est arrêté
 Write-Host ""
 Write-Host "🛑 Arrêt du backend API..." -ForegroundColor Yellow
-Stop-Process -Id $backendProcess.Id -Force -ErrorAction SilentlyContinue
+Stop-Job -Job $backendJob -ErrorAction SilentlyContinue
+Remove-Job -Job $backendJob -Force -ErrorAction SilentlyContinue
 Write-Host "✅ Backend arrêté" -ForegroundColor Green

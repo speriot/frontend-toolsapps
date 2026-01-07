@@ -1,7 +1,7 @@
 [
   {
     "email": "admin@toolsapps.eu",
-    "passwordHash": "$2a$10$VOYXNMzmPuCablzBPe907ud6ZX.ywNqOgCVj74UWvFAN/Q3clZCBW",
+    "passwordHash": "$2a$10$.vimmzCPLPSDZIdmB8y11O5MmLbk3qX63vT4ATsusrJL3byggIToG",
     "name": "Admin",
     "role": "admin"
   }

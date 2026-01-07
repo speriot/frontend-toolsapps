@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import mqtt from 'mqtt'
 import {
   DoorOpen, DoorClosed, Wifi, WifiOff, AlertCircle, CheckCircle2,
   Clock, Activity, Signal, Zap, XCircle, Cpu, HardDrive, MemoryStick, Info,
   ChevronDown, ChevronUp
 } from 'lucide-react'
 
-const MQTT_CONFIG = {
-  host: 'wss://3d3f4f89176c45f38dab27f19cc275b4.s1.eu.hivemq.cloud:8884/mqtt',
-  username: 'portal569',
-  password: 'FMBUUX288547bbxiio',
-  clientId: `portal_dashboard_${Math.random().toString(16).slice(2, 10)}`,
+// Configuration du backend SSE
+const SSE_CONFIG = {
+  // En développement local
+  url: import.meta.env.VITE_MQTT_SSE_URL || 'http://localhost:3003/api/portal/events',
+  // En production : 'https://votre-domaine.com/api/portal/events'
 }
 
 const TOPICS = {
@@ -78,116 +77,106 @@ export default function PortalDashboard() {
   const [messagesByTopic, setMessagesByTopic] = useState({})
   const [openAccordions, setOpenAccordions] = useState({})
   
-  const clientRef = useRef(null)
+  const eventSourceRef = useRef(null)
   const heartbeatTimeoutRef = useRef(null)
 
   useEffect(() => {
-    // Connexion MQTT
-    const client = mqtt.connect(MQTT_CONFIG.host, {
-      username: MQTT_CONFIG.username,
-      password: MQTT_CONFIG.password,
-      clientId: MQTT_CONFIG.clientId,
-      reconnectPeriod: 5000,
-    })
+    console.log('🔌 Connexion au backend SSE...')
+    
+    // Créer la connexion SSE
+    const eventSource = new EventSource(SSE_CONFIG.url)
+    eventSourceRef.current = eventSource
 
-    clientRef.current = client
-
-    client.on('connect', () => {
-      console.log('Connected to MQTT broker')
+    eventSource.onopen = () => {
+      console.log('✅ Connecté au backend SSE')
       setConnectionStatus('connected')
-      
-      // S'abonner aux topics
-      client.subscribe(TOPICS.LED, (err) => {
-        if (err) console.error('Erreur abonnement LED:', err)
-      })
-      client.subscribe(TOPICS.HEARTBEAT, (err) => {
-        if (err) console.error('Erreur abonnement HEARTBEAT:', err)
-      })
-      client.subscribe(TOPICS.ALERT, (err) => {
-        if (err) console.error('Erreur abonnement ALERT:', err)
-      })
-      client.subscribe(TOPICS.SYSTEM_REPORT, (err) => {
-        if (err) console.error('Erreur abonnement SYSTEM_REPORT:', err)
-      })
-    })
+    }
 
-    client.on('message', (topic, message) => {
-      const payload = JSON.parse(message.toString())
-      const timestamp = new Date()
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        const { topic, payload, receivedAt } = data
+        const timestamp = new Date(receivedAt)
 
-      // Ajouter au log des messages groupés par topic
-      setMessagesByTopic(prev => {
-        const topicMessages = prev[topic] || []
-        return {
-          ...prev,
-          [topic]: [{
-            payload,
-            receivedAt: timestamp
-          }, ...topicMessages].slice(0, 10) // Garder les 10 derniers par topic
-        }
-      })
+        console.log('📨 Message SSE reçu:', topic)
 
-      switch (topic) {
-        case TOPICS.LED:
-          setPortalState({
-            state: payload.state,
-            color: payload.color,
-            timestamp: new Date(payload.timestamp),
-          })
-          break
-
-        case TOPICS.HEARTBEAT:
-          setHeartbeat({
-            timestamp: new Date(payload.timestamp),
-            uptime_ms: payload.uptime_ms,
-            ip: payload.ip,
-            rssi: payload.rssi,
-            isAlive: true,
-          })
-          
-          // Réinitialiser le timeout de heartbeat
-          if (heartbeatTimeoutRef.current) {
-            clearTimeout(heartbeatTimeoutRef.current)
+        // Ajouter au log des messages groupés par topic
+        setMessagesByTopic(prev => {
+          const topicMessages = prev[topic] || []
+          return {
+            ...prev,
+            [topic]: [{
+              payload,
+              receivedAt: timestamp
+            }, ...topicMessages].slice(0, 10) // Garder les 10 derniers par topic
           }
-          heartbeatTimeoutRef.current = setTimeout(() => {
-            setHeartbeat(prev => ({ ...prev, isAlive: false }))
-          }, 60000) // 60s sans heartbeat = offline
-          break
+        })
 
-        case TOPICS.ALERT:
-          setAlert({
-            active: payload.active,
-            timestamp: new Date(payload.timestamp),
-          })
-          break
+        // Traiter selon le topic
+        switch (topic) {
+          case TOPICS.LED:
+            setPortalState({
+              state: payload.state,
+              color: payload.color,
+              timestamp: new Date(payload.timestamp),
+            })
+            break
 
-        case TOPICS.SYSTEM_REPORT:
-          setSystemReport({
-            ...payload,
-            timestamp: new Date(payload.timestamp),
-          })
-          break
+          case TOPICS.HEARTBEAT:
+            setHeartbeat({
+              timestamp: new Date(payload.timestamp),
+              uptime_ms: payload.uptime_ms,
+              ip: payload.ip,
+              rssi: payload.rssi,
+              isAlive: true,
+            })
+            
+            // Réinitialiser le timeout de heartbeat
+            if (heartbeatTimeoutRef.current) {
+              clearTimeout(heartbeatTimeoutRef.current)
+            }
+            heartbeatTimeoutRef.current = setTimeout(() => {
+              setHeartbeat(prev => ({ ...prev, isAlive: false }))
+            }, 60000) // 60s sans heartbeat = offline
+            break
+
+          case TOPICS.ALERT:
+            setAlert({
+              active: payload.active,
+              timestamp: new Date(payload.timestamp),
+            })
+            break
+
+          case TOPICS.SYSTEM_REPORT:
+            setSystemReport({
+              ...payload,
+              timestamp: new Date(payload.timestamp),
+            })
+            break
+        }
+      } catch (err) {
+        console.error('❌ Erreur parsing message SSE:', err)
       }
-    })
+    }
 
-    client.on('error', (err) => {
-      console.error('MQTT Error:', err)
+    eventSource.onerror = (err) => {
+      console.error('❌ Erreur SSE:', err)
       setConnectionStatus('error')
-    })
-
-    client.on('offline', () => {
-      setConnectionStatus('offline')
-    })
-
-    client.on('reconnect', () => {
-      setConnectionStatus('reconnecting')
-    })
+      
+      // EventSource reconnecte automatiquement, mais on peut améliorer ça
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setConnectionStatus('offline')
+      } else {
+        setConnectionStatus('reconnecting')
+      }
+    }
 
     return () => {
+      console.log('🔌 Fermeture connexion SSE')
       if (heartbeatTimeoutRef.current) {
         clearTimeout(heartbeatTimeoutRef.current)
       }
-      client.end()
+      eventSource.close()
     }
   }, [])
 
@@ -199,7 +188,7 @@ export default function PortalDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Portail Principal</h1>
-          <p className="text-muted-foreground">Surveillance en temps réel</p>
+          <p className="text-muted-foreground">Surveillance en temps réel via SSE</p>
         </div>
         
         {/* Connection Status */}

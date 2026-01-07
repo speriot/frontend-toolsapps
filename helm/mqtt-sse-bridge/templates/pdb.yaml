@@ -1,0 +1,13 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mqtt-sse-bridge.fullname" . }}
+  labels:
+    {{- include "mqtt-sse-bridge.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "mqtt-sse-bridge.selectorLabels" . | nindent 6 }}
+{{- end }}

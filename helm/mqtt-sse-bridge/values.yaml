@@ -1,0 +1,152 @@
+# Default values for mqtt-sse-bridge
+replicaCount: 2
+
+image:
+  repository: st3ph31/mqtt-sse-bridge
+  pullPolicy: IfNotPresent
+  tag: "v1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3003
+  targetPort: 3003
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Important pour SSE : désactiver le buffering
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  hosts:
+    - host: api.toolsapps.eu
+      paths:
+        - path: /api/portal/events
+          pathType: Prefix
+        - path: /api/portal/state
+          pathType: Prefix
+  tls:
+    - secretName: api-tls
+      hosts:
+        - api.toolsapps.eu
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configuration de l'application
+env:
+  - name: PORT
+    value: "3003"
+  - name: NODE_ENV
+    value: "production"
+  # MQTT Configuration (secrets via ConfigMap/Secret pour la production)
+  - name: MQTT_HOST
+    value: "wss://3d3f4f89176c45f38dab27f19cc275b4.s1.eu.hivemq.cloud:8884/mqtt"
+  - name: MQTT_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: mqtt-credentials
+        key: username
+        optional: true
+  - name: MQTT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mqtt-credentials
+        key: password
+        optional: true
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3003
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3003
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Network Policy (optionnel)
+networkPolicy:
+  enabled: false
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 3003
+  egress:
+    # Autoriser l'accès au broker MQTT externe
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8884
+    # Autoriser DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53

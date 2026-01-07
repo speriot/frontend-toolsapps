@@ -33,7 +33,7 @@ function loadUsers() {
     {
       email: 'admin@toolsapps.eu',
       // Mot de passe hashé pour 'admin123' (à changer en production)
-      passwordHash: '$2a$10$YourHashedPasswordHere',
+      passwordHash: '$2a$10$.vimmzCPLPSDZIdmB8y11O5MmLbk3qX63vT4ATsusrJL3byggIToG',
       name: 'Admin',
       role: 'admin'
     }
