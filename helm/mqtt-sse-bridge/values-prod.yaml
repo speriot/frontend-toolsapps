@@ -27,6 +27,15 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # Important pour SSE : désactiver le buffering
     traefik.ingress.kubernetes.io/buffering: "off"
+  hosts:
+    - host: api.toolsapps.eu
+      paths:
+        - path: /api/portal
+          pathType: Prefix
+  tls:
+    - secretName: mqtt-sse-bridge-tls
+      hosts:
+        - api.toolsapps.eu
 
 podDisruptionBudget:
   enabled: true
